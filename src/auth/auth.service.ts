@@ -1,7 +1,7 @@
 import {
-  ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 
 import { UserLoginDTO } from './dto/user-login.dto';
@@ -23,7 +23,7 @@ export class AuthService {
     if (!user) throw new NotFoundException('User not found');
 
     const isPasswordMatch = await compare(userLoginDTO.password, user.password);
-    if (!isPasswordMatch) throw new ConflictException('Invalid password');
+    if (!isPasswordMatch) throw new UnauthorizedException('Invalid password');
 
     return user;
   }
