@@ -1,11 +1,11 @@
-import { ValidateIf, IsEmail, IsNumber } from 'class-validator';
+import { IsEmail, IsNumber, ValidateIf } from 'class-validator';
 
 export class UserFindOneDto {
   @ValidateIf((o) => o.email === undefined)
   @IsNumber()
-  id: number;
+  id?: number;
 
   @ValidateIf((o) => o.id === undefined)
   @IsEmail()
-  email: string;
+  email?: string;
 }
