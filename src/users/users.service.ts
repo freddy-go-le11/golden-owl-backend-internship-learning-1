@@ -52,7 +52,7 @@ export class UsersService {
     return this.userRepository.save(updatedUser);
   }
 
-  remove(id: number) {
+  delete(id: number) {
     return this.userRepository.delete(id);
   }
 }
