@@ -27,7 +27,7 @@ export class UsersService {
       ) {
         throw new ConflictException('Email already exists');
       }
-      throw error; // Rethrow the error if it's not related to the unique constraint
+      throw error;
     }
   }
 
