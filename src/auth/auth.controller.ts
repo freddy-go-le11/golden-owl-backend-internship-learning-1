@@ -9,8 +9,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() userRegisterDTO: UserCreateDTO) {
-    await this.authService.register(userRegisterDTO);
-    return;
+  register(@Body() userRegisterDTO: UserCreateDTO) {
+    return this.authService.register(userRegisterDTO);
   }
 }
