@@ -19,13 +19,12 @@ export class UsersService {
   async create(userCreateDto: UserCreateDTO) {
     try {
       const user = this.userRepository.create(userCreateDto);
-      return this.userRepository.save(user);
+      return await this.userRepository.save(user);
     } catch (error) {
       if (
         error instanceof QueryFailedError &&
         error.driverError.code === ENUM_POSTGRES_ERROR_CODE.UniqueViolation
       ) {
-        // 23505 is the PostgreSQL error code for unique violation
         throw new ConflictException('Email already exists');
       }
       throw error; // Rethrow the error if it's not related to the unique constraint

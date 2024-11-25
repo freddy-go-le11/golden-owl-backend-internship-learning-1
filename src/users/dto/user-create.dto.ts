@@ -1,11 +1,4 @@
-import {
-  IsString,
-  IsEmail,
-  IsNotEmpty,
-  MinLength,
-  IsEnum,
-} from 'class-validator';
-import { ENUM_GENDER } from 'src/common/enum';
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class UserCreateDTO {
   @IsString()
@@ -20,8 +13,4 @@ export class UserCreateDTO {
   @MinLength(8)
   @IsNotEmpty()
   readonly password: string;
-
-  @IsString()
-  @IsEnum(ENUM_GENDER)
-  readonly gender: ENUM_GENDER;
 }
