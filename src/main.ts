@@ -1,3 +1,5 @@
+import * as cookieParser from 'cookie-parser';
+
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import { ResponseInterceptor } from './interceptors';
@@ -13,6 +15,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.use(cookieParser());
 
   app.enableCors({
     origin: (origin, callback) => {
