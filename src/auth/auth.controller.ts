@@ -1,14 +1,6 @@
 import { AuthService } from './auth.service';
 import { UserExceptionFilter } from 'src/users/users.exception';
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Post,
-  Req,
-  UseFilters,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Post, Req, UseFilters, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UserLoginDTO, UserRegisterDTO } from './dto';
 import { CustomizeJwtService } from 'src/jwt/jwt.service';
@@ -26,6 +18,21 @@ export class AuthController {
     return this.authService.register(userRegisterDTO);
   }
 
+  setCookie(
+    @Res({ passthrough: true }) res: Response,
+    name: string,
+    value: string,
+    expiresInDays: number,
+  ) {
+    res.cookie(name, value, {
+      httpOnly: false,
+      secure: true,
+      path: '/',
+      sameSite: 'none',
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * expiresInDays),
+    });
+  }
+
   @Post('login')
   async login(
     @Body() userLoginDTO: UserLoginDTO,
@@ -34,23 +41,8 @@ export class AuthController {
     const { accessToken, refreshToken } =
       await this.authService.login(userLoginDTO);
 
-    const currentDate = new Date();
-
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: false,
-      secure: true,
-      path: '/',
-      sameSite: 'none',
-      expires: new Date(currentDate.getTime() + 1000 * 60 * 60 * 24 * 1),
-    });
-    res.cookie('accessToken', accessToken, {
-      httpOnly: false,
-      secure: true,
-      path: '/',
-      sameSite: 'none',
-      expires: new Date(currentDate.getTime() + 1000 * 60 * 60 * 24 * 7),
-    });
-
+    this.setCookie(res, 'accessToken', accessToken, 1);
+    this.setCookie(res, 'refreshToken', refreshToken, 7);
     return;
   }
 
@@ -67,22 +59,10 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const refreshToken = req.cookies['refreshToken'];
-    console.log('🚀 ~ AuthController ~ refreshToken:', refreshToken);
-    if (!refreshToken)
-      throw new BadRequestException('No refresh token provided');
-    const accessToken = req.cookies['accessToken'];
-    if (accessToken) return;
-
     const newAccessToken =
       this.jwtService.getAccessTokenFromRefreshToken(refreshToken);
 
-    res.cookie('accessToken', newAccessToken, {
-      httpOnly: false,
-      secure: true,
-      path: '/',
-      sameSite: 'none',
-    });
-
+    this.setCookie(res, 'accessToken', newAccessToken, 1);
     return res;
   }
 }
