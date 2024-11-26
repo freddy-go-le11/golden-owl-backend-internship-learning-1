@@ -1,8 +1,10 @@
 import { AuthService } from './auth.service';
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseFilters } from '@nestjs/common';
 import { UserCreateDTO } from 'src/users/dto';
+import { UserExceptionFilter } from 'src/users/users.exception';
 
 @Controller('auth')
+@UseFilters(UserExceptionFilter)
 export class AuthController {
   constructor(private authService: AuthService) {}
 

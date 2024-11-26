@@ -1,12 +1,10 @@
-import { Injectable, NotFoundException, UseFilters } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserCreateDTO, UserFindOneDto, UserUpdateDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { UserAlreadyException } from './users.exception';
 
 @Injectable()
-@UseFilters(UserAlreadyException)
 export class UsersService {
   constructor(
     @InjectRepository(User)
