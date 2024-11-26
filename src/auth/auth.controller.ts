@@ -22,8 +22,18 @@ export class AuthController {
     const { accessToken, refreshToken } =
       await this.authService.login(userLoginDTO);
 
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
-    res.cookie('accessToken', accessToken, { httpOnly: true, secure: true });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: false,
+      secure: true,
+      path: '/',
+      sameSite: 'none',
+    });
+    res.cookie('accessToken', accessToken, {
+      httpOnly: false,
+      secure: true,
+      path: '/',
+      sameSite: 'none',
+    });
 
     return;
   }
