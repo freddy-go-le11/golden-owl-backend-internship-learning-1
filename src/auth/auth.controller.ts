@@ -4,14 +4,17 @@ import {
   Body,
   Controller,
   Post,
+  UseFilters,
   Req,
   Res,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UserLoginDTO, UserRegisterDTO } from './dto';
 import { CustomizeJwtService } from 'src/jwt/jwt.service';
+import { UserExceptionFilter } from 'src/users/users.exception';
 
 @Controller('auth')
+@UseFilters(UserExceptionFilter)
 export class AuthController {
   constructor(
     private authService: AuthService,
