@@ -17,7 +17,7 @@ export class AuthService {
     private readonly jwtService: CustomizeJwtService,
   ) {}
 
-  register(userRegisterDTO: UserCreateDTO) {
+  register(userRegisterDTO: UserRegisterDTO) {
     return this.usersService.create(userRegisterDTO);
   }
 
