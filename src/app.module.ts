@@ -2,13 +2,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { CustomizeJwtModule } from './jwt/jwt.module';
+import { CustomizeJwtService } from './jwt/jwt.service';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath: 'env/.env' }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: 'env/.env' }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -21,8 +23,9 @@ import { UsersModule } from './users/users.module';
     }),
     UsersModule,
     AuthModule,
+    CustomizeJwtModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, CustomizeJwtService],
 })
 export class AppModule {}

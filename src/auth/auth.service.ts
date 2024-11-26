@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
+import { CustomizeJwtService } from './../jwt/jwt.service';
 import { UserLoginDTO } from './dto/user-login.dto';
 import { UserRegisterDTO } from './dto';
 import { UsersService } from 'src/users/users.service';
@@ -11,7 +12,10 @@ import { compare } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: CustomizeJwtService,
+  ) {}
 
   async register(userRegisterDTO: UserRegisterDTO) {
     return this.usersService.create(userRegisterDTO);
@@ -24,6 +28,10 @@ export class AuthService {
     const isPasswordMatch = await compare(userLoginDTO.password, user.password);
     if (!isPasswordMatch) throw new UnauthorizedException('Invalid password');
 
-    return user;
+    const payload = { id: user.id, email: user.email };
+    const accessToken = this.jwtService.getAccessToken(payload);
+    const refreshToken = this.jwtService.getRefreshToken(payload);
+
+    return { accessToken, refreshToken };
   }
 }
