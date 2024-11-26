@@ -6,8 +6,7 @@ import { UsersService } from 'src/users/users.service';
 export class AuthService {
   constructor(private readonly usersService: UsersService) {}
 
-  async register(userRegisterDTO: UserCreateDTO) {
-    await this.usersService.create(userRegisterDTO);
-    return;
+  register(userRegisterDTO: UserCreateDTO) {
+    return this.usersService.create(userRegisterDTO);
   }
 }
