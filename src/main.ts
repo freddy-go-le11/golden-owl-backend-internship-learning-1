@@ -12,11 +12,17 @@ async function bootstrap() {
     }),
   );
 
+  // Retrieve and split multiple CORS regex patterns from the environment variable
+  const corsWhitelistRegexes = process.env.CORS_WHITELIST_REGEX
+    ? process.env.CORS_WHITELIST_REGEX.split(',').map(
+        (pattern) => new RegExp(pattern),
+      )
+    : [];
+
   app.enableCors({
     origin: (origin, callback) => {
-      // Check if the origin is either localhost:3000 or matches the regex for golden-owl
-      if (typeof origin === 'undefined' || origin === 'http://localhost:3000') {
-        callback(null, true); // Allow the request
+      if (!origin || corsWhitelistRegexes.some((regex) => regex.test(origin))) {
+        callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS')); // Reject the request
       }
