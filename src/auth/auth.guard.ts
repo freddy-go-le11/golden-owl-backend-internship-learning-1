@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 
 import { Observable } from 'rxjs';
-import { Request } from 'express';
+import { TAuthRequest } from 'src/types/types';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -11,10 +11,8 @@ export class AuthGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const req = context.switchToHttp().getRequest() as Request;
+    const req = context.switchToHttp().getRequest() as TAuthRequest;
 
-    return this.mustAuthenticated
-      ? req.cookies['accessToken'] === undefined
-      : req.cookies['accessToken'] !== undefined;
+    return this.mustAuthenticated ? !!req.auth?.id : !req.auth?.id;
   }
 }

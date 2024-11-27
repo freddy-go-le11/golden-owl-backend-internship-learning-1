@@ -1,25 +1,31 @@
 import { AuthService } from './auth.service';
 import { UserExceptionFilter } from 'src/users/users.exception';
-import { Body, Controller, Post, Req, UseFilters, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Req,
+  UseFilters,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { UserLoginDTO, UserRegisterDTO } from './dto';
-import { CustomizeJwtService } from 'src/jwt/jwt.service';
 import {
   COOKIE_ACCESS_TOKEN_KEY,
   COOKIE_REFRESH_TOKEN_KEY,
 } from 'src/common/constants';
 import { TAuthRequest } from 'src/types/types';
 import { getCookieOptions } from 'src/common/functions';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 @UseFilters(UserExceptionFilter)
 export class AuthController {
-  constructor(
-    private authService: AuthService,
-    private jwtService: CustomizeJwtService,
-  ) {}
+  constructor(private authService: AuthService) {}
 
   @Post('register')
+  @UseGuards(new AuthGuard(false))
   register(@Body() userRegisterDTO: UserRegisterDTO) {
     return this.authService.register(userRegisterDTO);
   }
@@ -34,6 +40,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @UseGuards(new AuthGuard(false))
   async login(
     @Body() userLoginDTO: UserLoginDTO,
     @Res({ passthrough: true }) res: Response,
@@ -47,6 +54,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @UseGuards(new AuthGuard(true))
   async logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie(COOKIE_REFRESH_TOKEN_KEY);
     res.clearCookie(COOKIE_ACCESS_TOKEN_KEY);
