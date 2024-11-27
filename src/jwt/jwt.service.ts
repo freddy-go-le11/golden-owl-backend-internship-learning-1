@@ -9,24 +9,34 @@ export class CustomizeJwtService {
     private readonly configService: ConfigService,
   ) {}
 
-  getAccessToken(payload: any) {
+  verifyAccessToken(token: string): any {
+    return this.jwtService.verify(token, {
+      secret: this.configService.get('JWT_SECRET'),
+    });
+  }
+
+  getAccessToken(payload: any): string {
     return this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_SECRET'),
       expiresIn: '1d',
     });
   }
 
-  getRefreshToken(payload: any) {
+  getRefreshToken(payload: any): string {
     return this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_REFRESH_SECRET'),
       expiresIn: '7d',
     });
   }
 
-  getAccessTokenFromRefreshToken(refreshToken: string) {
+  getAccessTokenFromRefreshToken(refreshToken: string): string {
     const payload = this.jwtService.verify(refreshToken, {
       secret: this.configService.get('JWT_REFRESH_SECRET'),
     });
+
+    delete payload.iat;
+    delete payload.exp;
+
     return this.getAccessToken(payload);
   }
 }

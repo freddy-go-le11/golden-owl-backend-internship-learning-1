@@ -1,9 +1,15 @@
 import { AuthService } from './auth.service';
 import { UserExceptionFilter } from 'src/users/users.exception';
 import { Body, Controller, Post, Req, UseFilters, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { UserLoginDTO, UserRegisterDTO } from './dto';
 import { CustomizeJwtService } from 'src/jwt/jwt.service';
+import {
+  COOKIE_ACCESS_TOKEN_KEY,
+  COOKIE_REFRESH_TOKEN_KEY,
+} from 'src/common/constants';
+import { TAuthRequest } from 'src/types/types';
+import { getCookieOptions } from 'src/common/functions';
 
 @Controller('auth')
 @UseFilters(UserExceptionFilter)
@@ -24,13 +30,7 @@ export class AuthController {
     value: string,
     expiresInDays: number,
   ) {
-    res.cookie(name, value, {
-      httpOnly: false,
-      secure: true,
-      path: '/',
-      sameSite: 'none',
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * expiresInDays),
-    });
+    res.cookie(name, value, getCookieOptions({ expiresInDays }));
   }
 
   @Post('login')
@@ -41,28 +41,23 @@ export class AuthController {
     const { accessToken, refreshToken } =
       await this.authService.login(userLoginDTO);
 
-    this.setCookie(res, 'accessToken', accessToken, 1);
-    this.setCookie(res, 'refreshToken', refreshToken, 7);
+    this.setCookie(res, COOKIE_ACCESS_TOKEN_KEY, accessToken, 1);
+    this.setCookie(res, COOKIE_REFRESH_TOKEN_KEY, refreshToken, 7);
     return;
   }
 
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('refreshToken');
-    res.clearCookie('accessToken');
+    res.clearCookie(COOKIE_REFRESH_TOKEN_KEY);
+    res.clearCookie(COOKIE_ACCESS_TOKEN_KEY);
     return;
   }
 
-  @Post('refresh-token')
-  async refreshToken(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    const refreshToken = req.cookies['refreshToken'];
-    const newAccessToken =
-      this.jwtService.getAccessTokenFromRefreshToken(refreshToken);
+  @Post('access-token')
+  async accessToken() {}
 
-    this.setCookie(res, 'accessToken', newAccessToken, 1);
-    return res;
+  @Post('session')
+  async session(@Req() req: TAuthRequest) {
+    return req.auth;
   }
 }
