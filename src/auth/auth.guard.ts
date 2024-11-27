@@ -7,6 +7,7 @@ import { Request } from 'express';
 export class AuthGuard implements CanActivate {
   constructor(private readonly mustAuthenticated: boolean) {}
 
+  // TODO: Implement the canActivate method
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
