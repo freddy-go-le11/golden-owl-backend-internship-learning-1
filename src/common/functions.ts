@@ -1,4 +1,8 @@
-import { COOKIE_DEFAULT_OPTIONS, DAY_IN_MILL } from './constants';
+import {
+  COOKIE_DEFAULT_OPTIONS,
+  DAY_IN_MILL,
+  OAUTH_GOOGLE_API_URL,
+} from './constants';
 
 import { CookieOptions } from 'express';
 
@@ -11,4 +15,13 @@ export const getCookieOptions = (
     ...options,
     expires: new Date(Date.now() + DAY_IN_MILL * expiresInDays),
   };
+};
+
+export const getUserInfoViaGoogleAccessToken = async (
+  googleAccessToken: string,
+) => {
+  const response = await fetch(OAUTH_GOOGLE_API_URL, {
+    headers: { Authorization: `Bearer ${googleAccessToken}` },
+  });
+  return response.json();
 };

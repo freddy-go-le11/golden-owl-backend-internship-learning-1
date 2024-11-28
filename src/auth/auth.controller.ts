@@ -62,6 +62,17 @@ export class AuthController {
     return this.handleSuccessLogin(res, data);
   }
 
+  @Post('/login/google')
+  @UseGuards(new AuthGuard(false))
+  async googleLogin(
+    @Body('access_token') googleAccessToken: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const data =
+      await this.authService.loginOrCreateUserViaGoogle(googleAccessToken);
+    return this.handleSuccessLogin(res, data);
+  }
+
   @Post('logout')
   @UseGuards(new AuthGuard(true))
   async logout(@Res({ passthrough: true }) res: Response) {
