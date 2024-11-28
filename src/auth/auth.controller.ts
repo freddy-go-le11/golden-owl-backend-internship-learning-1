@@ -50,7 +50,11 @@ export class AuthController {
 
     this.setCookie(res, COOKIE_ACCESS_TOKEN_KEY, accessToken, 1);
     this.setCookie(res, COOKIE_REFRESH_TOKEN_KEY, refreshToken, 7);
-    return;
+    return {
+      metadata: {
+        message: 'Login Successful',
+      },
+    };
   }
 
   @Post('logout')
@@ -58,7 +62,11 @@ export class AuthController {
   async logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie(COOKIE_REFRESH_TOKEN_KEY);
     res.clearCookie(COOKIE_ACCESS_TOKEN_KEY);
-    return;
+    return {
+      metadata: {
+        message: 'Logout Successful',
+      },
+    };
   }
 
   @Post('access-token')
