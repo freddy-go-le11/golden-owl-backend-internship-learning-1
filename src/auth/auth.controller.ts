@@ -1,7 +1,23 @@
 import { AuthService } from './auth.service';
-import { Body, Controller, Post, UseFilters } from '@nestjs/common';
-import { UserCreateDTO } from 'src/users/dto';
 import { UserExceptionFilter } from 'src/users/users.exception';
+import {
+  Body,
+  Controller,
+  Post,
+  Req,
+  UseFilters,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { Response } from 'express';
+import { UserLoginDTO, UserRegisterDTO } from './dto';
+import {
+  COOKIE_ACCESS_TOKEN_KEY,
+  COOKIE_REFRESH_TOKEN_KEY,
+} from 'src/common/constants';
+import { TAuthRequest } from 'src/types/types';
+import { getCookieOptions } from 'src/common/functions';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 @UseFilters(UserExceptionFilter)
@@ -9,8 +25,55 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() userRegisterDTO: UserCreateDTO) {
-    await this.authService.register(userRegisterDTO);
-    return;
+  @UseGuards(new AuthGuard(false))
+  register(@Body() userRegisterDTO: UserRegisterDTO) {
+    return this.authService.register(userRegisterDTO);
+  }
+
+  setCookie(
+    @Res({ passthrough: true }) res: Response,
+    name: string,
+    value: string,
+    expiresInDays: number,
+  ) {
+    res.cookie(name, value, getCookieOptions({ expiresInDays }));
+  }
+
+  @Post('login')
+  @UseGuards(new AuthGuard(false))
+  async login(
+    @Body() userLoginDTO: UserLoginDTO,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken, refreshToken } =
+      await this.authService.login(userLoginDTO);
+
+    this.setCookie(res, COOKIE_ACCESS_TOKEN_KEY, accessToken, 1);
+    this.setCookie(res, COOKIE_REFRESH_TOKEN_KEY, refreshToken, 7);
+    return {
+      metadata: {
+        message: 'Login Successful',
+      },
+    };
+  }
+
+  @Post('logout')
+  @UseGuards(new AuthGuard(true))
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie(COOKIE_REFRESH_TOKEN_KEY);
+    res.clearCookie(COOKIE_ACCESS_TOKEN_KEY);
+    return {
+      metadata: {
+        message: 'Logout Successful',
+      },
+    };
+  }
+
+  @Post('access-token')
+  async accessToken() {}
+
+  @Post('session')
+  async session(@Req() req: TAuthRequest) {
+    return req.auth;
   }
 }

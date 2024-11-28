@@ -10,3 +10,8 @@ export enum ENUM_POSTGRES_ERROR_CODE {
   ForeignKeyViolation = '23503',
   CheckViolation = '23514',
 }
+
+export enum ENUM_USER_ROLE {
+  Admin = 'admin',
+  User = 'user',
+}

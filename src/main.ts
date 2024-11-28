@@ -1,9 +1,13 @@
+import * as cookieParser from 'cookie-parser';
+
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
+import { ResponseInterceptor } from './interceptors';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -12,7 +16,8 @@ async function bootstrap() {
     }),
   );
 
-  // Retrieve and split multiple CORS regex patterns from the environment variable
+  app.use(cookieParser());
+
   const corsWhitelistRegexes = process.env.CORS_WHITELIST_REGEX
     ? process.env.CORS_WHITELIST_REGEX.split(',').map(
         (pattern) => new RegExp(pattern),
@@ -24,11 +29,12 @@ async function bootstrap() {
       if (!origin || corsWhitelistRegexes.some((regex) => regex.test(origin))) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS')); // Reject the request
+        callback(new Error('Not allowed by CORS'));
       }
     },
-    methods: 'GET,POST,PUT,PATCH,DELETE', // Allow specific HTTP methods (optional)
-    allowedHeaders: 'Content-Type, Authorization', // Allow specific headers (optional)
+    methods: 'GET,POST,PUT,PATCH,DELETE',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true,
   });
 
   await app.listen(process.env.PORT ?? 3001);
