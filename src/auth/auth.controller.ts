@@ -39,22 +39,27 @@ export class AuthController {
     res.cookie(name, value, getCookieOptions({ expiresInDays }));
   }
 
+  handleSuccessLogin(
+    @Res({ passthrough: true }) res: Response,
+    {
+      session,
+      accessToken,
+      refreshToken,
+    }: Awaited<ReturnType<AuthService['login']>>,
+  ) {
+    this.setCookie(res, COOKIE_ACCESS_TOKEN_KEY, accessToken, 1);
+    this.setCookie(res, COOKIE_REFRESH_TOKEN_KEY, refreshToken, 7);
+    return session;
+  }
+
   @Post('login')
   @UseGuards(new AuthGuard(false))
   async login(
     @Body() userLoginDTO: UserLoginDTO,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { accessToken, refreshToken } =
-      await this.authService.login(userLoginDTO);
-
-    this.setCookie(res, COOKIE_ACCESS_TOKEN_KEY, accessToken, 1);
-    this.setCookie(res, COOKIE_REFRESH_TOKEN_KEY, refreshToken, 7);
-    return {
-      metadata: {
-        message: 'Login Successful',
-      },
-    };
+    const data = await this.authService.login(userLoginDTO);
+    return this.handleSuccessLogin(res, data);
   }
 
   @Post('logout')
