@@ -1,4 +1,5 @@
-import { COOKIE_DEFAULT_OPTIONS } from './constants';
+import { COOKIE_DEFAULT_OPTIONS, DAY_IN_MILL } from './constants';
+
 import { CookieOptions } from 'express';
 
 export const getCookieOptions = (
@@ -8,6 +9,6 @@ export const getCookieOptions = (
   const options = Object.assign(COOKIE_DEFAULT_OPTIONS, rest);
   return {
     ...options,
-    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * expiresInDays),
+    expires: new Date(Date.now() + DAY_IN_MILL * expiresInDays),
   };
 };
