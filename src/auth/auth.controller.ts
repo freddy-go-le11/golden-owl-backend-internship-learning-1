@@ -1,22 +1,22 @@
 import { AuthService } from './auth.service';
-import { UserExceptionFilter } from 'src/users/users.exception';
-import {
-  Body,
-  Controller,
-  Post,
-  Req,
-  UseFilters,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
-import { Response } from 'express';
-import { UserLoginDTO, UserRegisterDTO } from './dto';
 import {
   COOKIE_ACCESS_TOKEN_KEY,
   COOKIE_REFRESH_TOKEN_KEY,
 } from 'src/common/constants';
 import { TAuthRequest } from 'src/types/types';
 import { getCookieOptions } from 'src/common/functions';
+import {
+  Body,
+  Controller,
+  Post,
+  UseFilters,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { Response } from 'express';
+import { UserLoginDTO, UserRegisterDTO } from './dto';
+import { UserExceptionFilter } from 'src/users/users.exception';
 import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
