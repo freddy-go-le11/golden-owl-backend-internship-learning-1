@@ -1,8 +1,4 @@
-import {
-  COOKIE_DEFAULT_OPTIONS,
-  DAY_IN_MILL,
-  OAUTH_GOOGLE_API_URL,
-} from './constants';
+import { COOKIE_DEFAULT_OPTIONS, DAY_IN_MILL } from './constants';
 
 import { CookieOptions } from 'express';
 
@@ -17,11 +13,6 @@ export const getCookieOptions = (
   };
 };
 
-export const getUserInfoViaGoogleAccessToken = async (
-  googleAccessToken: string,
-) => {
-  const response = await fetch(OAUTH_GOOGLE_API_URL, {
-    headers: { Authorization: `Bearer ${googleAccessToken}` },
-  });
-  return response.json();
+export const getDefaultPwd = () => {
+  return Math.random().toString(36).substring(7);
 };

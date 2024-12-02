@@ -68,8 +68,7 @@ export class AuthController {
     @Body('access_token') googleAccessToken: string,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const data =
-      await this.authService.loginOrCreateUserViaGoogle(googleAccessToken);
+    const data = await this.authService.loginGoogle(googleAccessToken);
     return this.handleSuccessLogin(res, data);
   }
 
