@@ -12,3 +12,7 @@ export const getCookieOptions = (
     expires: new Date(Date.now() + DAY_IN_MILL * expiresInDays),
   };
 };
+
+export const getDefaultPwd = () => {
+  return Math.random().toString(36).substring(7);
+};
